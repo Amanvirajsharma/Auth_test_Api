@@ -103,6 +103,11 @@ class AuthResponse(BaseModel):
     message: str
     data: Optional[dict] = None
 
+class DifficultyEnum(str, Enum):
+    EASY = "easy"
+    MEDIUM = "medium"
+    HARD = "hard"
+
 
 # ============ PROFILE MODELS ============
 class ProfileCreate(BaseModel):
@@ -142,7 +147,7 @@ class ProfileUpdate(BaseModel):
     role: Optional[RoleEnum] = None
 
 class ProfileResponse(BaseModel):
-    id: UUID
+    uuid: UUID        # 🔥 ADD THIS
     full_name: str
     email: str
     phone: Optional[str] = None
@@ -161,6 +166,7 @@ class ProfileResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
 
 class RoleStats(BaseModel):
     total_users: int
@@ -185,17 +191,24 @@ class PaginatedResponse(BaseModel):
 
 # ============ TEST MODELS ============
 class TestCreate(BaseModel):
-    title: str = Field(..., min_length=3, max_length=200, examples=["Python Basics Test"])
-    description: Optional[str] = Field(None, examples=["Test your Python knowledge"])
-    duration_minutes: int = Field(default=60, ge=5, le=300, examples=[60])
-    total_marks: int = Field(default=100, ge=1, examples=[100])
-    passing_marks: int = Field(default=40, ge=0, examples=[40])
+    title: str = Field(..., min_length=3, max_length=200)
+    description: Optional[str] = None
+
+    difficulty: DifficultyEnum = DifficultyEnum.MEDIUM   # 🔥 ADD THIS
+
+    duration_minutes: int = Field(default=60, ge=5, le=300)
+    total_marks: int = Field(default=100, ge=1)
+    passing_marks: int = Field(default=40, ge=0)
     start_time: Optional[datetime] = None
     end_time: Optional[datetime] = None
+
 
 class TestUpdate(BaseModel):
     title: Optional[str] = Field(None, min_length=3, max_length=200)
     description: Optional[str] = None
+
+    difficulty: Optional[DifficultyEnum] = None   # 🔥 ADD THIS
+
     duration_minutes: Optional[int] = Field(None, ge=5, le=300)
     total_marks: Optional[int] = Field(None, ge=1)
     passing_marks: Optional[int] = Field(None, ge=0)
@@ -204,10 +217,14 @@ class TestUpdate(BaseModel):
     start_time: Optional[datetime] = None
     end_time: Optional[datetime] = None
 
+
 class TestResponse(BaseModel):
     id: UUID
     title: str
     description: Optional[str] = None
+
+    difficulty: str        # 🔥 ADD THIS
+
     duration_minutes: int
     total_marks: int
     passing_marks: int

@@ -12,9 +12,14 @@ class TestService:
         self.table = "tests"
     
     def create_test(self, test_data: TestCreate, created_by: str) -> Optional[dict]:
-        """Create new test"""
         data = test_data.model_dump(exclude_none=True)
+    
+     # 🔥 ADD THIS LINE
+        if "difficulty" in data:
+             data["difficulty"] = test_data.difficulty.value
+    
         data["created_by"] = created_by
+
         
         # Convert datetime to string
         if 'start_time' in data and data['start_time']:
@@ -72,8 +77,12 @@ class TestService:
         return response.data, total
     
     def update_test(self, test_id: UUID, update_data: TestUpdate) -> Optional[dict]:
-        """Update test"""
         data = update_data.model_dump(exclude_none=True)
+
+    # 🔥 ADD THIS
+        if "difficulty" in data and data["difficulty"] is not None:
+            data["difficulty"] = data["difficulty"].value
+
         
         if not data:
             return self.get_test_by_id(test_id)

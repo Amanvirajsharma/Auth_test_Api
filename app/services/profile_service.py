@@ -2,6 +2,8 @@ from app.database import db_client
 from app.models import ProfileCreate, ProfileUpdate, RoleEnum
 from typing import Optional
 from uuid import UUID
+import uuid
+
 
 
 class ProfileService:
@@ -24,12 +26,15 @@ class ProfileService:
         return data
     
     def create_profile(self, profile_data: ProfileCreate) -> Optional[dict]:
-        """Create new profile"""
         data = profile_data.model_dump(exclude_none=True)
         data = self._convert_enums(data)
-        
+
+        # 🔥 ADD THIS (PUBLIC UUID)
+        data["uuid"] = str(uuid.uuid4())
+
         response = self.client.from_(self.table).insert(data).execute()
         return response.data[0] if response.data else None
+
     
     def get_profile_by_id(self, profile_id: UUID) -> Optional[dict]:
         """Get profile by ID"""
@@ -153,6 +158,16 @@ class ProfileService:
             "total_institutions": institutions_count,
             "total_profiles": users_count + institutions_count
         }
+        
+        
+    def get_profile_by_uuid(self, profile_uuid: UUID) -> Optional[dict]:
+        response = self.client.from_(self.table)\
+        .select("*")\
+        .eq("uuid", str(profile_uuid))\
+        .execute()
+
+        return response.data[0] if response.data else None
+
 
 
 # Singleton instance

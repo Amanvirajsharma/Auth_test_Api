@@ -139,14 +139,13 @@ def search_profiles(
     )
 
 
-@router.get("/{profile_id}", response_model=APIResponse)
-def get_profile(profile_id: UUID):
-    """👤 Ek specific profile dekho"""
-    profile = profile_service.get_profile_by_id(profile_id)
-    
+@router.get("/{profile_uuid}", response_model=APIResponse)
+def get_profile(profile_uuid: UUID):
+    profile = profile_service.get_profile_by_uuid(profile_uuid)
+
     if not profile:
         raise HTTPException(status_code=404, detail="Profile not found!")
-    
+
     return APIResponse(
         success=True,
         message="Profile found!",
@@ -154,36 +153,38 @@ def get_profile(profile_id: UUID):
     )
 
 
-@router.put("/{profile_id}", response_model=APIResponse)
-def update_profile(profile_id: UUID, profile_update: ProfileUpdate):
-    """✏️ Profile update karo"""
-    existing = profile_service.get_profile_by_id(profile_id)
+@router.put("/{profile_uuid}", response_model=APIResponse)
+def update_profile(profile_uuid: UUID, profile_update: ProfileUpdate):
+    existing = profile_service.get_profile_by_uuid(profile_uuid)
     if not existing:
         raise HTTPException(status_code=404, detail="Profile not found!")
-    
-    updated_profile = profile_service.update_profile(profile_id, profile_update)
-    
+
+    updated = profile_service.client.from_("profiles")\
+        .update(profile_update.model_dump(exclude_none=True))\
+        .eq("uuid", str(profile_uuid))\
+        .execute()
+
     return APIResponse(
         success=True,
         message="Profile updated!",
-        data=updated_profile
+        data=updated.data[0] if updated.data else None
     )
 
 
-@router.delete("/{profile_id}", response_model=APIResponse)
-def delete_profile(profile_id: UUID):
-    """🗑️ Profile delete karo"""
-    existing = profile_service.get_profile_by_id(profile_id)
+
+@router.delete("/{profile_uuid}", response_model=APIResponse)
+def delete_profile(profile_uuid: UUID):
+    existing = profile_service.get_profile_by_uuid(profile_uuid)
     if not existing:
         raise HTTPException(status_code=404, detail="Profile not found!")
-    
-    deleted = profile_service.delete_profile(profile_id)
-    
-    if not deleted:
-        raise HTTPException(status_code=500, detail="Failed to delete!")
-    
+
+    deleted = profile_service.client.from_("profiles")\
+        .delete()\
+        .eq("uuid", str(profile_uuid))\
+        .execute()
+
     return APIResponse(
         success=True,
         message="Profile deleted!",
-        data={"deleted_id": str(profile_id)}
+        data={"deleted_uuid": str(profile_uuid)}
     )
