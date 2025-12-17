@@ -111,26 +111,26 @@ class DifficultyEnum(str, Enum):
 
 # ============ PROFILE MODELS ============
 class ProfileCreate(BaseModel):
-    full_name: str = Field(..., min_length=2, max_length=100, examples=["Rahul Sharma"])
+    user_id: UUID                     # 🔑 AUTH user id
+    full_name: str = Field(..., min_length=2, max_length=100)
     email: str = Field(..., examples=["rahul@example.com"])
-    phone: Optional[str] = Field(None, max_length=15, examples=["9876543210"])
-    bio: Optional[str] = Field(None, examples=["Software Developer"])
+    phone: Optional[str] = None
+    bio: Optional[str] = None
     avatar_url: Optional[str] = None
-    date_of_birth: Optional[date] = None
     gender: Optional[GenderEnum] = None
-    address: Optional[str] = None
     city: Optional[CityEnum] = None
-    state: StateEnum = Field(default=StateEnum.MADHYA_PRADESH)
-    country: CountryEnum = Field(default=CountryEnum.INDIA)
-    role: RoleEnum = Field(default=RoleEnum.USER)
-    
-    @field_validator('email')
+    state: StateEnum = StateEnum.MADHYA_PRADESH
+    country: CountryEnum = CountryEnum.INDIA
+    role: RoleEnum = RoleEnum.USER
+
+    @field_validator("email")
     @classmethod
-    def validate_email(cls, v):
-        email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-        if not re.match(email_regex, v):
-            raise ValueError('Invalid email format')
+    def normalize_email(cls, v):
         return v.lower()
+
+
+    
+ 
 
 class ProfileUpdate(BaseModel):
     full_name: Optional[str] = Field(None, min_length=2, max_length=100)
@@ -147,18 +147,16 @@ class ProfileUpdate(BaseModel):
     role: Optional[RoleEnum] = None
 
 class ProfileResponse(BaseModel):
-    uuid: UUID        # 🔥 ADD THIS
+    id: UUID
+    user_id: UUID
     full_name: str
-    email: str
-    phone: Optional[str] = None
-    bio: Optional[str] = None
-    avatar_url: Optional[str] = None
-    date_of_birth: Optional[date] = None
-    gender: Optional[str] = None
-    address: Optional[str] = None
-    city: Optional[str] = None
-    state: Optional[str] = None
-    country: Optional[str] = None
+    phone: Optional[str]
+    bio: Optional[str]
+    avatar_url: Optional[str]
+    gender: Optional[str]
+    city: Optional[str]
+    state: Optional[str]
+    country: Optional[str]
     role: str
     is_active: bool
     created_at: datetime
@@ -166,6 +164,7 @@ class ProfileResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
 
 
 class RoleStats(BaseModel):
