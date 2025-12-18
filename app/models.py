@@ -116,6 +116,11 @@ class ProfileCreate(BaseModel):
     email: str = Field(..., examples=["rahul@example.com"])
     phone: Optional[str] = None
     bio: Optional[str] = None
+    date_of_birth: date = Field(
+        ...,
+        description="Date of Birth (YYYY-MM-DD)",
+        examples=["2000-05-15"]
+    )
     avatar_url: Optional[str] = None
     gender: Optional[GenderEnum] = None
     city: Optional[CityEnum] = None
