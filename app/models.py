@@ -111,16 +111,17 @@ class DifficultyEnum(str, Enum):
 
 # ============ PROFILE MODELS ============
 class ProfileCreate(BaseModel):
-    user_id: UUID                     # 🔑 AUTH user id
     full_name: str = Field(..., min_length=2, max_length=100)
     email: str = Field(..., examples=["rahul@example.com"])
-    phone: Optional[str] = None
-    bio: Optional[str] = None
+
     date_of_birth: date = Field(
         ...,
         description="Date of Birth (YYYY-MM-DD)",
         examples=["2000-05-15"]
     )
+
+    phone: Optional[str] = None
+    bio: Optional[str] = None
     avatar_url: Optional[str] = None
     gender: Optional[GenderEnum] = None
     city: Optional[CityEnum] = None
@@ -132,6 +133,7 @@ class ProfileCreate(BaseModel):
     @classmethod
     def normalize_email(cls, v):
         return v.lower()
+
 
 
     
