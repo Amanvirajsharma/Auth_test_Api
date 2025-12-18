@@ -113,13 +113,7 @@ class DifficultyEnum(str, Enum):
 class ProfileCreate(BaseModel):
     full_name: str = Field(..., min_length=2, max_length=100)
     email: str = Field(..., examples=["rahul@example.com"])
-
-    date_of_birth: date = Field(
-        ...,
-        description="Date of Birth (YYYY-MM-DD)",
-        examples=["2000-05-15"]
-    )
-
+    date_of_birth: date = Field(..., examples=["2000-05-15"])
     phone: Optional[str] = None
     bio: Optional[str] = None
     avatar_url: Optional[str] = None
@@ -128,6 +122,7 @@ class ProfileCreate(BaseModel):
     state: StateEnum = StateEnum.MADHYA_PRADESH
     country: CountryEnum = CountryEnum.INDIA
     role: RoleEnum = RoleEnum.USER
+
 
     @field_validator("email")
     @classmethod

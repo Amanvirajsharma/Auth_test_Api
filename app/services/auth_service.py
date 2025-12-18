@@ -100,18 +100,19 @@ class AuthService:
         return None
     
     def get_user_by_id(self, user_id: str) -> Optional[dict]:
-        """ID se user dhundta hai"""
-        response = self.client.from_(self.table)\
-            .select("*")\
-            .eq("id", user_id)\
-            .execute()
-        
-        if response.data:
-            user = response.data[0]
-            user.pop('password_hash', None)
-            return user
-        
-        return None
+      response = self.client.from_(self.table) \
+          .select("*") \
+          .eq("id", str(user_id)) \
+          .execute()
+    
+      if not response.data:
+          return None
+    
+      user = response.data[0]
+      user.pop("password_hash", None)
+      return user
+
+
     
     def update_last_login(self, user_id: str) -> None:
         """Last login time update karta hai"""
